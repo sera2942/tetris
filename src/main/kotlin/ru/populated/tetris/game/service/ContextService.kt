@@ -24,7 +24,7 @@ class ContextService {
     }
 
     fun createNewContex(): Context {
-        var context = Context()
+        val context = Context()
         store.put(context.id, context)
         return context
     }
@@ -40,7 +40,7 @@ class ContextService {
     }
 
     fun addUserINContext(contextId: UUID, userId: UUID) {
-        var user = userService.findUserById(userId)
+        val user = userService.findUserById(userId)
         user?.let { getContextById(contextId)?.users?.add(it) }
     }
 }
