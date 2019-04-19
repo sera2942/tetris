@@ -1,11 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
 import * as serviceWorker from './serviceWorker';
+import RSocket from './RSocket';
 
 const list = [[0, 1, 0, 1], [1, 1, 0, 1], [1, 0, 0, 1]]
-
+const option = {
+    host: "localhost",
+    port: "8080",
+}
 function Bord(prop) {
     return prop.list.map((list) => <div className="line">
         {
@@ -18,6 +21,7 @@ function Bord(prop) {
 
 function getColor(number) {
     if (number === 1) {
+        RSocket.getClientTransport('tcp', option)
         return "column cell"
     }
     return "column"
