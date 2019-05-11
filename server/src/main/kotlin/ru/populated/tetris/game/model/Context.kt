@@ -9,6 +9,6 @@ class Context {
 
     var users: MutableList<User> = ArrayList()
 
-    var gameField: GameField = GameField(15, 20)
+    var gameField: GameField = GameField(10, 5)
 
 }

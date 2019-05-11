@@ -1,6 +1,7 @@
 package ru.populated.tetris.game.service
 
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import ru.populated.tetris.game.model.Context
 import java.util.*
@@ -11,7 +12,8 @@ import java.util.stream.Collectors
 class ContextService {
     private val LOG = LoggerFactory.getLogger(this.javaClass.name)
 
-    lateinit var userService: UserService;
+    @Autowired
+    lateinit var userService: UserService
     val store: ConcurrentHashMap<UUID, Context> = ConcurrentHashMap()
 
 
@@ -41,6 +43,10 @@ class ContextService {
 
     fun addUserINContext(contextId: UUID, userId: UUID) {
         val user = userService.findUserById(userId)
-        user?.let { getContextById(contextId)?.users?.add(it) }
+        user?.let {
+            var context: Context = this.getContextById(contextId)!!
+                context.users.add(it)
+                context.gameField.expendGameField(4, 0)
+        }
     }
 }
