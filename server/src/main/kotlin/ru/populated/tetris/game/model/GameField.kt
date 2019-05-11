@@ -9,10 +9,10 @@ class GameField(width: Int, length: Int) {
     var bord: MutableList<MutableList<Cell>> = mutableListOf()
 
     init {
-        for (i in 0..width) {
+        for (y in 0..width) {
             bord.add(mutableListOf())
-            for (j in 0..length)
-                bord[i].add(Cell())
+            for (x in 0..length)
+                bord[y].add(Cell())
         }
     }
 
@@ -21,9 +21,9 @@ class GameField(width: Int, length: Int) {
         length = length.plus(x)
         width = width.plus(y)
 
-        for (i in 0..width) {
-            for (j in lastLength until length)
-                bord[i].add(Cell())
+        for (innerY in 0..width) {
+            for (innerX in lastLength until length)
+                bord[innerY].add(Cell())
         }
 
     }

@@ -119,16 +119,16 @@ class GameController {
             }
         } else {
 
-            var doUserHaveAbilityOfMoving = haveAbilityOfMoving(user, context.gameField, event)
+            var isFreeGameSpace = isFreeGameSpace(user, context.gameField, event)
             var cellsBelongToUser = false
             var cellsIsEmpty = false
 
-            if (doUserHaveAbilityOfMoving) {
+            if (isFreeGameSpace) {
                 cellsBelongToUser = cellsBelongToUser(user, context.gameField, event)
                 cellsIsEmpty = !cellsIsNotEmpty(user, context.gameField, event)
             }
 
-            if (doUserHaveAbilityOfMoving && !cellsBelongToUser && cellsIsEmpty) {
+            if (isFreeGameSpace && !cellsBelongToUser && cellsIsEmpty) {
                 user.figure.forEach {
                     if (it.y!! >= 0) {
                         deleteUserFigure(context, it)
@@ -143,7 +143,7 @@ class GameController {
                 }
 
 
-            } else clearUserFigure(user, context.gameField, event, cellsBelongToUser, cellsIsEmpty, doUserHaveAbilityOfMoving)
+            } else clearUserFigure(user, context.gameField, event, cellsBelongToUser, cellsIsEmpty, isFreeGameSpace)
         }
 
 
@@ -178,6 +178,32 @@ class GameController {
                 }
             }
             user.figure.clear()
+            removeFullLine(field)
+        }
+    }
+
+    private fun removeFullLine(gameField: GameField) {
+
+        for (y in 1..gameField.width) {
+
+            var doOverwriteLine = true
+            for (x in 0..gameField.length) {
+                if (gameField.bord[y][x].userId == null && gameField.bord[y][x].color == null) {
+                    doOverwriteLine = false
+                    break
+                }
+            }
+
+            if (doOverwriteLine) {
+                for (innerY in y downTo 1) {
+                    for (x in 0..gameField.length) {
+                        if (gameField.bord[innerY - 1][x].userId == null && gameField.bord[innerY][x].userId == null) {
+                            gameField.bord[innerY][x].color = gameField.bord[innerY - 1][x].color
+                            gameField.bord[innerY - 1][x] = Cell()
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -195,7 +221,7 @@ class GameController {
         return false
     }
 
-    fun haveAbilityOfMoving(user: User, field: GameField, event: Event): Boolean {
+    fun isFreeGameSpace(user: User, field: GameField, event: Event): Boolean {
         return !user.figure.stream()
                 .filter { it.y!! >= 0 }
                 .filter {
