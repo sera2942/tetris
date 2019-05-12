@@ -3,7 +3,6 @@ package ru.populated.tetris.game.model
 class Part(x: Int, y: Int) {
     var x: Int? = x
     var y: Int? = y
-    var color: String? = null
 
     fun pluseOneToX() {
         x = x?.plus(1)

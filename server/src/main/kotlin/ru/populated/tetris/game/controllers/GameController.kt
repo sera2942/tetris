@@ -114,12 +114,29 @@ class GameController {
         val user = userService.findUserById(event.userId) ?: return null
 
         if (initUser(user, context)) {
-            user.figure.forEach {
+            user.figure.form.forEach {
                 putUserFigure(context, it, user)
             }
         } else {
 
-            var isFreeGameSpace = isFreeGameSpace(user, context.gameField, event)
+            var figure = user.figure
+
+            if (event.direction == Direction.TURN) {
+                if (user.figure.position.plus(1) >= Figures.values()[user.figure.figureNumber].form!!.size) {
+                    user.figure.position = -1
+                }
+                figure = Figure(user.figure.figureNumber,
+                        user.figure.position,
+                        Figures.values()[user.figure.figureNumber]
+                                .form?.get(user.figure.position + 1)!!.stream()
+                                .map { it.copy() }
+                                .peek {
+                                    it.x = user.baseX?.let { it1 -> it.x?.plus(it1) }
+                                    it.y = user.baseY?.let { it1 -> it.y?.plus(it1) }
+                                }.collect(Collectors.toList()))
+            }
+
+            var isFreeGameSpace = isFreeGameSpace(figure, context.gameField, event)
             var cellsBelongToUser = false
             var cellsIsEmpty = false
 
@@ -129,20 +146,23 @@ class GameController {
             }
 
             if (isFreeGameSpace && !cellsBelongToUser && cellsIsEmpty) {
-                user.figure.forEach {
-                    if (it.y!! >= 0) {
+
+                user.figure.form.forEach {
+                    if (it.y!! >= 0 && it.x!! >= 0) {
                         deleteUserFigure(context, it)
                     }
                 }
-                user.figure.forEach {
-
+                if (event.direction == Direction.TURN) {
+                    user.figure = figure
+                    user.figure.position = user.figure.position.plus(1)
+                }
+                user.figure.form.forEach {
                     it.y = it.y!!.plus(event.direction.deltaY)
                     it.x = it.x!!.plus(event.direction.deltaX)
                     putUserFigure(context, it, user)
-
                 }
-
-
+                user.baseX = user.baseX!!.plus(event.direction.deltaX)
+                user.baseY = user.baseY!!.plus(event.direction.deltaY)
             } else clearUserFigure(user, context.gameField, event, cellsBelongToUser, cellsIsEmpty, isFreeGameSpace)
         }
 
@@ -158,7 +178,7 @@ class GameController {
     private fun putUserFigure(context: Context, cell: Part, user: User) {
         if (cell.x!! >= 0 && cell.y!! >= 0) {
             context.gameField.bord[cell.y!!][cell.x!!].userId = user.id
-            context.gameField.bord[cell.y!!][cell.x!!].color = user.figure[3].color
+            context.gameField.bord[cell.y!!][cell.x!!].color = user.color!!.name
         }
     }
 
@@ -172,12 +192,15 @@ class GameController {
         var isItEndFreeGameSpace = !cellsBelongToUser && !cellsIsEmpty
         var isItFreeGameSpace = isItEndFreeGameSpace || !doUserHaveAbilityOfMoving
         if (Direction.SOUTH == event.direction && isItFreeGameSpace) {
-            user.figure.forEach {
-                if (it.y!! >= 0) {
+            user.figure.form.forEach {
+                if (it.y!! >= 0 && it.x!! >= 0) {
                     field.bord[it.y!!][it.x!!].userId = null
                 }
             }
-            user.figure.clear()
+            user.baseX = null
+            user.baseY = null
+            user.figure.position = 0
+            user.figure.form.clear()
             removeFullLine(field)
         }
     }
@@ -208,22 +231,36 @@ class GameController {
     }
 
     private fun initUser(user: User, context: Context): Boolean {
-        if (user.figure.isEmpty()) {
-            user.figure.addAll(Figures.values()[Random.nextInt(0, Figures.values().size)].form!!.stream().map { it.copy() }
-                    .collect(Collectors.toList()))
-            user.figure.stream()
+        if (user.figure.form.isEmpty()) {
+            user.figure.figureNumber = Random.nextInt(0, Figures.values().size)
+            takeNewFigureForUser(user)
+            user.figure.form.stream()
                     .forEach {
                         it.x = it.x?.plus(context.users.indexOf(user) * 3 + 2)
-                        it.color = Colors.values()[Random.nextInt(0, Colors.values().size)].name
                     }
+            user.color = Colors.values()[Random.nextInt(0, Colors.values().size)]
             return true
         }
         return false
     }
 
-    fun isFreeGameSpace(user: User, field: GameField, event: Event): Boolean {
-        return !user.figure.stream()
-                .filter { it.y!! >= 0 }
+    private fun takeNewFigureForUser(user: User) {
+        user.figure.form.addAll(Figures.values()[user.figure.figureNumber].form?.get(user.figure.position)!!
+                .stream()
+                .map { it.copy() }
+                .peek {
+                    if (user.baseX == null) {
+                        user.baseX = it.x
+                        user.baseY = it.y
+                    }
+                }
+                .collect(Collectors.toList())
+        )
+    }
+
+    fun isFreeGameSpace(figure: Figure, field: GameField, event: Event): Boolean {
+        return !figure.form.stream()
+                .filter { it.y!! >= 0 && it.x!! >= 0 }
                 .filter {
                     it.x?.plus(event.direction.deltaX)!! > field.length
                             || it.y?.plus(event.direction.deltaY)!! > field.width
@@ -235,8 +272,8 @@ class GameController {
     }
 
     fun cellsBelongToUser(user: User, field: GameField, event: Event): Boolean {
-        return user.figure.stream()
-                .filter { it.y!! >= 0 }
+        return user.figure.form.stream()
+                .filter { it.y!! >= 0 && it.x!! >= 0 }
                 .filter {
                     field.bord[it.y?.plus(event.direction.deltaY)!!][it.x?.plus(event.direction.deltaX)!!]
                             .userId != null
@@ -249,8 +286,8 @@ class GameController {
     }
 
     fun cellsIsNotEmpty(user: User, field: GameField, event: Event): Boolean {
-        return user.figure.stream()
-                .filter { it.y!! >= 0 }
+        return user.figure.form.stream()
+                .filter { it.y!! >= 0 && it.x!! >= 0 }
                 .filter {
                     field
                             .bord[it.y?.plus(event.direction.deltaY)!!][it.x?.plus(event.direction.deltaX)!!]

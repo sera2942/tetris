@@ -5,6 +5,9 @@ import java.util.*
 
 class User : Serializable {
     val id: UUID = UUID.randomUUID()
-    var figure: MutableList<Part> = mutableListOf()
+    var figure: Figure = Figure(0, 0, mutableListOf())
     var name: String? = null
+    var color: Colors? = null
+    var baseX: Int? = null
+    var baseY: Int? = null
 }
