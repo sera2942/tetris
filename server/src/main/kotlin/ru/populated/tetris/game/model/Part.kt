@@ -1,18 +1,16 @@
 package ru.populated.tetris.game.model
 
-class Part(x: Int, y: Int) {
-    var x: Int? = x
-    var y: Int? = y
+class Part(var x: Int, var y: Int, var base: Boolean) {
 
     fun pluseOneToX() {
-        x = x?.plus(1)
+        x = x.plus(1)
     }
 
     fun pluseOneToY() {
-        y = y?.plus(1)
+        y = y.plus(1)
     }
 
     fun copy(): Part {
-        return Part(x!!, y!!)
+        return Part(x, y, false)
     }
 }

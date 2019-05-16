@@ -17,17 +17,28 @@ import io.rsocket.kotlin.util.AbstractRSocket
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
-import ru.populated.tetris.game.model.*
+import ru.populated.tetris.game.model.Cell
+import ru.populated.tetris.game.model.Event
+import ru.populated.tetris.game.model.GameField
 import ru.populated.tetris.game.service.ContextService
 import ru.populated.tetris.game.service.UserService
+import ru.populated.tetris.game.service.actions.Action
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.TimeUnit
-import java.util.stream.Collectors
-import kotlin.random.Random
 
 @Controller
 class GameController {
+
+    private val LOG = LoggerFactory.getLogger(this.javaClass.name)
+    private val port = 9988
+    private val mapper = ObjectMapper().registerKotlinModule()
+    private val closeable: Single<NettyContextCloseable> = initializeRSocket()
+    private var generationSpeed = 500L
+    private var tickerSubject = BehaviorSubject.createDefault<Long>(generationSpeed)
+    private val source = PublishSubject.create<MutableList<MutableList<Cell>>>()
+
+    private val queue: Queue<Event> = ConcurrentLinkedQueue()
 
     @Autowired
     lateinit var userService: UserService
@@ -35,14 +46,8 @@ class GameController {
     @Autowired
     lateinit var contextService: ContextService
 
-    private val queue: Queue<Event> = ConcurrentLinkedQueue()
-    private val LOG = LoggerFactory.getLogger(this.javaClass.name)
-    private val port = 9988
-    private val mapper = ObjectMapper().registerKotlinModule()
-    private val closeable: Single<NettyContextCloseable> = initializeRSocket()
-    private var generationSpeed = 1000L
-    private var tickerSubject = BehaviorSubject.createDefault<Long>(generationSpeed)
-    private val source = PublishSubject.create<MutableList<MutableList<Cell>>>()
+    @Autowired
+    lateinit var actions: List<Action>
 
     init {
         createIntervalWithVariableTimer()
@@ -55,15 +60,8 @@ class GameController {
                 })
     }
 
-    /**
-     * Handler for the socket. Connects the sightings to the RSocket
-     * and maps the items into JSON. If we wanted different types of handlers or a handle to the client side
-     * RSocket, we could pass the acceptor lambda parameters here.
-     */
     private fun handler(): Single<RSocket> {
         return Single.just(object : AbstractRSocket() {
-            // Here we could implement more of the API from AbstractSocket and provide e.g. single request/response
-            // data. We want just a stream and a single fire and forget without paying attention to the payload
 
             override fun requestStream(payload: Payload): Flowable<Payload> {
                 return source
@@ -82,12 +80,9 @@ class GameController {
         })
     }
 
-    /**
-     *  Initialize the RSocket listener with WebSocket as the Server transport and listen to port. Sets handler()
-     */
     private fun initializeRSocket(): Single<NettyContextCloseable> = RSocketFactory
             .receive()
-            .acceptor { { _, _ -> handler() } } // server handler RSocket
+            .acceptor { { _, _ -> handler() } }
             .transport(WebsocketServerTransport.create("0.0.0.0", port))
             .start()
 
@@ -103,199 +98,14 @@ class GameController {
                 }
     }
 
-    fun nextEvent(): Event {
-        return queue.poll()
-    }
-
     fun play(): GameField? {
 
-        val event = nextEvent()
+        val event = queue.poll()
         val context = contextService.getContextById(event.contextId) ?: return null
         val user = userService.findUserById(event.userId) ?: return null
-
-        if (initUser(user, context)) {
-            user.figure.form.forEach {
-                putUserFigure(context, it, user)
-            }
-        } else {
-
-            var figure = user.figure
-
-            if (event.direction == Direction.TURN) {
-                if (user.figure.position.plus(1) >= Figures.values()[user.figure.figureNumber].form!!.size) {
-                    user.figure.position = -1
-                }
-                figure = Figure(user.figure.figureNumber,
-                        user.figure.position,
-                        Figures.values()[user.figure.figureNumber]
-                                .form?.get(user.figure.position + 1)!!.stream()
-                                .map { it.copy() }
-                                .peek {
-                                    it.x = user.baseX?.let { it1 -> it.x?.plus(it1) }
-                                    it.y = user.baseY?.let { it1 -> it.y?.plus(it1) }
-                                }.collect(Collectors.toList()))
-            }
-
-            var isFreeGameSpace = isFreeGameSpace(figure, context.gameField, event)
-            var cellsBelongToUser = false
-            var cellsIsEmpty = false
-
-            if (isFreeGameSpace) {
-                cellsBelongToUser = cellsBelongToUser(user, context.gameField, event)
-                cellsIsEmpty = !cellsIsNotEmpty(user, context.gameField, event)
-            }
-
-            if (isFreeGameSpace && !cellsBelongToUser && cellsIsEmpty) {
-
-                user.figure.form.forEach {
-                    if (it.y!! >= 0 && it.x!! >= 0) {
-                        deleteUserFigure(context, it)
-                    }
-                }
-                if (event.direction == Direction.TURN) {
-                    user.figure = figure
-                    user.figure.position = user.figure.position.plus(1)
-                }
-                user.figure.form.forEach {
-                    it.y = it.y!!.plus(event.direction.deltaY)
-                    it.x = it.x!!.plus(event.direction.deltaX)
-                    putUserFigure(context, it, user)
-                }
-                user.baseX = user.baseX!!.plus(event.direction.deltaX)
-                user.baseY = user.baseY!!.plus(event.direction.deltaY)
-            } else clearUserFigure(user, context.gameField, event, cellsBelongToUser, cellsIsEmpty, isFreeGameSpace)
-        }
-
+        actions.stream()
+                .forEach { it.doAction(user, context, event) }
 
         return context.gameField
-    }
-
-    private fun deleteUserFigure(context: Context, cell: Part) {
-        context.gameField.bord[cell.y!!][cell.x!!].userId = null
-        context.gameField.bord[cell.y!!][cell.x!!].color = null
-    }
-
-    private fun putUserFigure(context: Context, cell: Part, user: User) {
-        if (cell.x!! >= 0 && cell.y!! >= 0) {
-            context.gameField.bord[cell.y!!][cell.x!!].userId = user.id
-            context.gameField.bord[cell.y!!][cell.x!!].color = user.color!!.name
-        }
-    }
-
-    private fun clearUserFigure(user: User,
-                                field: GameField,
-                                event: Event,
-                                cellsBelongToUser: Boolean,
-                                cellsIsEmpty: Boolean,
-                                doUserHaveAbilityOfMoving: Boolean) {
-
-        var isItEndFreeGameSpace = !cellsBelongToUser && !cellsIsEmpty
-        var isItFreeGameSpace = isItEndFreeGameSpace || !doUserHaveAbilityOfMoving
-        if (Direction.SOUTH == event.direction && isItFreeGameSpace) {
-            user.figure.form.forEach {
-                if (it.y!! >= 0 && it.x!! >= 0) {
-                    field.bord[it.y!!][it.x!!].userId = null
-                }
-            }
-            user.baseX = null
-            user.baseY = null
-            user.figure.position = 0
-            user.figure.form.clear()
-            removeFullLine(field)
-        }
-    }
-
-    private fun removeFullLine(gameField: GameField) {
-
-        for (y in 1..gameField.width) {
-
-            var doOverwriteLine = true
-            for (x in 0..gameField.length) {
-                if (gameField.bord[y][x].userId == null && gameField.bord[y][x].color == null) {
-                    doOverwriteLine = false
-                    break
-                }
-            }
-
-            if (doOverwriteLine) {
-                for (innerY in y downTo 1) {
-                    for (x in 0..gameField.length) {
-                        if (gameField.bord[innerY - 1][x].userId == null && gameField.bord[innerY][x].userId == null) {
-                            gameField.bord[innerY][x].color = gameField.bord[innerY - 1][x].color
-                            gameField.bord[innerY - 1][x] = Cell()
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun initUser(user: User, context: Context): Boolean {
-        if (user.figure.form.isEmpty()) {
-            user.figure.figureNumber = Random.nextInt(0, Figures.values().size)
-            takeNewFigureForUser(user)
-            user.figure.form.stream()
-                    .forEach {
-                        it.x = it.x?.plus(context.users.indexOf(user) * 3 + 2)
-                    }
-            user.color = Colors.values()[Random.nextInt(0, Colors.values().size)]
-            return true
-        }
-        return false
-    }
-
-    private fun takeNewFigureForUser(user: User) {
-        user.figure.form.addAll(Figures.values()[user.figure.figureNumber].form?.get(user.figure.position)!!
-                .stream()
-                .map { it.copy() }
-                .peek {
-                    if (user.baseX == null) {
-                        user.baseX = it.x
-                        user.baseY = it.y
-                    }
-                }
-                .collect(Collectors.toList())
-        )
-    }
-
-    fun isFreeGameSpace(figure: Figure, field: GameField, event: Event): Boolean {
-        return !figure.form.stream()
-                .filter { it.y!! >= 0 && it.x!! >= 0 }
-                .filter {
-                    it.x?.plus(event.direction.deltaX)!! > field.length
-                            || it.y?.plus(event.direction.deltaY)!! > field.width
-                            || it.x?.plus(event.direction.deltaX)!! < 0
-                            || it.y?.plus(event.direction.deltaY)!! < 0
-                }
-                .findFirst()
-                .isPresent
-    }
-
-    fun cellsBelongToUser(user: User, field: GameField, event: Event): Boolean {
-        return user.figure.form.stream()
-                .filter { it.y!! >= 0 && it.x!! >= 0 }
-                .filter {
-                    field.bord[it.y?.plus(event.direction.deltaY)!!][it.x?.plus(event.direction.deltaX)!!]
-                            .userId != null
-                            && user.id != field
-                            .bord[it.y?.plus(event.direction.deltaY)!!][it.x?.plus(event.direction.deltaX)!!]
-                            .userId
-                }
-                .findFirst()
-                .isPresent
-    }
-
-    fun cellsIsNotEmpty(user: User, field: GameField, event: Event): Boolean {
-        return user.figure.form.stream()
-                .filter { it.y!! >= 0 && it.x!! >= 0 }
-                .filter {
-                    field
-                            .bord[it.y?.plus(event.direction.deltaY)!!][it.x?.plus(event.direction.deltaX)!!]
-                            .color != null && user.id != field
-                            .bord[it.y?.plus(event.direction.deltaY)!!][it.x?.plus(event.direction.deltaX)!!]
-                            .userId
-                }
-                .findFirst()
-                .isPresent
     }
 }
