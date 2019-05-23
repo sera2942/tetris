@@ -46,7 +46,7 @@ class ContextService {
         user?.let {
             var context: Context = this.getContextById(contextId)!!
                 context.users.add(it)
-                context.gameField.expendGameField(4, 0)
+                context.gameField.expendGameField(3, 0)
         }
     }
 }

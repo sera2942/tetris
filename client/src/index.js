@@ -1,16 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
+import './index.scss';
 import * as serviceWorker from './serviceWorker';
-// import axios from 'axios'
 
-// import Bord from './Bord.js';
+
 import Menu from './Menu';
 
-var content = <div>
-        <Menu/>
-    </div>;
-ReactDOM.render(content, document.getElementById('root'));
+ReactDOM.render(<Menu />, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
