@@ -1,0 +1,36 @@
+@import 'Common.scss';
+
+  .column { 
+    display: inline-block; 
+    border: 1px solid rgb(34, 78, 201); 
+    min-width: 30px;
+    min-height: 30px;
+  } 
+  
+  .cell {
+    background: #6d6d6d
+  }
+  
+  .cellRed {
+    background: #f19e95
+  }
+
+  .cellBlue {
+    background: #72abec
+  }
+
+  .cellYellow {
+    background: #f1e8a6
+  }
+
+  .cellOwnRed {
+    background: #e52020
+  }
+  
+  .cellOwnBlue {
+    background: #207ce5
+  }
+
+  .cellOwnYellow {
+    background: #efd203
+  }
