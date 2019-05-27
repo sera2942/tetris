@@ -1693,7 +1693,7 @@ boolbase@^1.0.0, boolbase@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/boolbase/-/boolbase-1.0.0.tgz#68dff5fbe60c51eb37725ea9e3ed310dcc1e776e"
 
-bootstrap@^4.3.1:
+bootstrap@4.3.1:
   version "4.3.1"
   resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-4.3.1.tgz#280ca8f610504d99d7b6b4bfc4b68cec601704ac"
 
@@ -7329,7 +7329,16 @@ react-scripts@2.1.8:
   optionalDependencies:
     fsevents "1.2.4"
 
-react-transition-group@^2.7.1:
+react-toastify:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/react-toastify/-/react-toastify-5.1.1.tgz#40e564a600ca22522f361226ab5f50c866447097"
+  dependencies:
+    "@babel/runtime" "^7.4.2"
+    classnames "^2.2.6"
+    prop-types "^15.7.2"
+    react-transition-group "^2.6.1"
+
+react-transition-group@^2.6.1, react-transition-group@^2.7.1:
   version "2.9.0"
   resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-2.9.0.tgz#df9cdb025796211151a436c69a8f3b97b5b07c8d"
   dependencies:
@@ -7346,6 +7355,10 @@ react@^16.8.6:
     object-assign "^4.1.1"
     prop-types "^15.6.2"
     scheduler "^0.13.6"
+
+reactjs-popup:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/reactjs-popup/-/reactjs-popup-1.4.1.tgz#d5ec829a0f94d4480144f8c52f71cc73b7941083"
 
 read-pkg-up@^1.0.1:
   version "1.0.1"
@@ -8548,6 +8561,10 @@ to-regex@^3.0.1, to-regex@^3.0.2:
     extend-shallow "^3.0.2"
     regex-not "^1.0.2"
     safe-regex "^1.1.0"
+
+toaster-js@2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/toaster-js/-/toaster-js-2.2.0.tgz#e2ddbf95225b4298636de8826aed17f4c02d1fc5"
 
 topo@2.x.x:
   version "2.0.2"

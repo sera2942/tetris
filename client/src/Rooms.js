@@ -52,11 +52,11 @@ class Rooms extends Component {
             </Card>
         }
         return <Col userid={this.props.userid} className="mt-5">
-
+            <Button className='btn btn-success mt-3 ml-2' onClick={this.handleClick}>Add room</Button>
             <div className="d-flex flex-wrap">
                 {
                     this.state.contexts.map(context => (
-                        <div className="card col-2 mt-2 ml-2 row" key={context.id + children++}>
+                        <div className="card mt-2 ml-2 mr-2 row" key={context.id + children++}>
                             <div className="card-body" key={context.id + children++}>
                                 <h5 className="card-title" key={context.id + children++}>Room №{++roomNumber}</h5>
                                 <Button className='col' onClick={(e) => this.addToRoom(context.id, roomNumber)} key={context.id + children++}>Come in Room {roomNumber}</Button>
@@ -64,7 +64,6 @@ class Rooms extends Component {
                         </div>))
                 }
             </div>
-            <Button className='btn btn-success mt-3 ml-2' onClick={this.handleClick}>Add room</Button>
         </Col>
     }
 }

@@ -11,4 +11,6 @@ class Context {
 
     var gameField: GameField = GameField(10, 0)
 
+    var typeState: TypeState = TypeState.IN_GAME
+
 }

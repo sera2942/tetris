@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './Bord.scss';
 import './Common.scss';
+import Popup from 'reactjs-popup'
 
 const {
     RSocketClient,
@@ -15,7 +16,8 @@ class Bord extends Component {
     constructor(props) {
         super()
         this.state = {
-            list: []
+            list: [],
+            gameIsOver: false
         }
 
         this.onAddUser = this.onAddUser.bind(this);
@@ -36,7 +38,6 @@ class Bord extends Component {
 
     onKeyPressed(e) {
         var action = null
-        // console.log(e.keyCode)
         if (e.keyCode == '37') {
             action = "EAST"
         }
@@ -49,7 +50,6 @@ class Bord extends Component {
         if (e.keyCode == '32') {
             action = "TURN"
         }
-        // console.log(action)
         if (action !== null) {
             const client = new RSocketClient({
                 serializers: JsonSerializers,
@@ -76,6 +76,17 @@ class Bord extends Component {
     }
 
     render() {
+
+        const PopupExample = () => (
+            <Popup className="text-danger text-center border border-warning rounded test"
+                open={this.state.gameIsOver}
+                closeOnDocumentClick>
+                {close => (
+                    <h1>Game OVER. You are loser &#128514;</h1>
+                )}
+            </Popup>
+        )
+
         return <div className="overflow-auto p-1" onKeyDown={this.onKeyPressed}>
             {
                 this.state.list.map((row) =>
@@ -87,6 +98,8 @@ class Bord extends Component {
                         }
                     </div>)
             }
+            <PopupExample />
+
         </div>
     }
 
@@ -117,6 +130,10 @@ class Bord extends Component {
                         var state = JSON.parse(payload.data)
                         if (state.contextId === this.props.roomid) {
                             this.setState({ list: state.board })
+                            if ("GAME_OVER" === state.typeState) {
+                                this.setState({ gameIsOver: true })
+                            }
+
                         }
                     },
                     onSubscribe: subscription => {

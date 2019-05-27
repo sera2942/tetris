@@ -33,7 +33,7 @@ class RemoveFullLineAction : Action {
 
 
         val isItEndFreeGameSpace = !notFreeSpace.check(user, context, event) && endFreeGameSpace.check(user, context, event)
-        var isItFreeGameSpace = isItEndFreeGameSpace || !gameSpace.check(user, context, event)
+        val isItFreeGameSpace = isItEndFreeGameSpace || !gameSpace.check(user, context, event)
 
 
         if (Direction.SOUTH == event.direction && isItFreeGameSpace && !userSpace.check(user, context, event)) {
@@ -45,9 +45,16 @@ class RemoveFullLineAction : Action {
 
 
     private fun takeFigureOfUser(user: User, context: Context) {
+        user.figure
+                .form
+                .stream()
+                .filter { it.y == 0 }
+                .findAny()
+                .ifPresent { context.typeState = TypeState.GAME_OVER }
+
         user.figure.form.forEach {
             if (it.y >= 0 && it.x >= 0) {
-                context.gameField.bord[it.y][it.x].userId = null
+                context.gameField.board[it.y][it.x].userId = null
             }
         }
 
@@ -59,7 +66,7 @@ class RemoveFullLineAction : Action {
 
     private fun removeFullLine(gameField: GameField) {
 
-        val bord: MutableList<MutableList<Cell>> = gameField.bord
+        val bord: MutableList<MutableList<Cell>> = gameField.board
         for (y in 1..gameField.width) {
 
             var doOverwriteLine = true

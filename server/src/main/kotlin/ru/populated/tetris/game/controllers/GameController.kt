@@ -93,8 +93,15 @@ class GameController {
                 .subscribe {
                     if (!queue.isEmpty()) {
                         val context = play()
-                        val boardState = BoardState(context!!.id, TypeState.IN_GAME, context.gameField.bord)
-                        source.onNext(boardState)
+                        if (context != null) {
+                            if (TypeState.IN_GAME == context.typeState) {
+                                source.onNext(BoardState(context.id, TypeState.IN_GAME, context.gameField.board))
+                            } else {
+                                source.onNext(BoardState(context.id, TypeState.GAME_OVER, context.gameField.board))
+                                contextService.store.remove(context.id)
+                            }
+                        }
+
                         tickerSubject.onNext(10)
                     } else {
                         tickerSubject.onNext(generationSpeed)

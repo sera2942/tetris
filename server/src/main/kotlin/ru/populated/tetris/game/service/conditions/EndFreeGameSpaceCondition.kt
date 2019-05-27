@@ -9,7 +9,7 @@ import ru.populated.tetris.game.model.User
 @Component("endFreeGameSpace")
 class EndFreeGameSpaceCondition : Condition {
     override fun check(user: User, context: Context, event: Event): Boolean {
-        var bord: MutableList<MutableList<Cell>> = context.gameField.bord
+        var bord: MutableList<MutableList<Cell>> = context.gameField.board
         return user.figure.form.stream()
                 .filter { it.y >= 0 && it.x >= 0 }
                 .filter { it.x.plus(event.direction.deltaX) >= 0 }

@@ -48,8 +48,8 @@ class MoveAction : Action {
         } else {
             user.figure.form.forEach {
                 if (it.y >= 0 && it.x >= 0) {
-                    context.gameField.bord[it.y][it.x].userId = user.id
-                    context.gameField.bord[it.y][it.x].color = user.color!!.name
+                    context.gameField.board[it.y][it.x].userId = user.id
+                    context.gameField.board[it.y][it.x].color = user.color!!.name
                 }
             }
         }
@@ -96,8 +96,8 @@ class MoveAction : Action {
     protected fun deleteUserFigure(figure: Figure, context: Context) {
         figure.form.forEach {
             if (it.y >= 0 && it.x >= 0 && it.y <= context.gameField.width && it.x <= context.gameField.length) {
-                context.gameField.bord[it.y][it.x].userId = null
-                context.gameField.bord[it.y][it.x].color = null
+                context.gameField.board[it.y][it.x].userId = null
+                context.gameField.board[it.y][it.x].color = null
             }
         }
 
@@ -116,8 +116,8 @@ class MoveAction : Action {
             if (it.x >= 0 && it.y >= 0
                     && it.y <= context.gameField.width
                     && it.x <= context.gameField.length) {
-                context.gameField.bord[it.y][it.x].userId = user.id
-                context.gameField.bord[it.y][it.x].color = user.color!!.name
+                context.gameField.board[it.y][it.x].userId = user.id
+                context.gameField.board[it.y][it.x].color = user.color!!.name
             }
         }
     }

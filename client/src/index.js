@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import './index.scss';
 import * as serviceWorker from './serviceWorker';
 
-
 import Menu from './Menu';
 
 ReactDOM.render(<Menu />, document.getElementById('root'));

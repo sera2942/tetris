@@ -16,8 +16,8 @@ class NotFreeSpaceCondition : Condition {
                 .filter {
                     val coordinateX = it.x.plus(event.direction.deltaX)
                     val coordinateY = it.y.plus(event.direction.deltaY)
-                    context.gameField.bord[coordinateY][coordinateX].userId != null
-                            && user.id != context.gameField.bord[coordinateY][coordinateX].userId
+                    context.gameField.board[coordinateY][coordinateX].userId != null
+                            && user.id != context.gameField.board[coordinateY][coordinateX].userId
                 }
                 .findFirst()
                 .isPresent

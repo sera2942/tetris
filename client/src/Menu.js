@@ -5,7 +5,7 @@ import axios from 'axios'
 import UserName from './UserName.js'
 import Rooms from './Rooms'
 import './Common.scss';
-import { Col, Row, Button } from 'react-bootstrap';
+import { Col, Row, Button, Navbar } from 'react-bootstrap';
 import './Menu.scss'
 
 
@@ -55,10 +55,11 @@ class Menu extends Component {
                 </Row>
             )
         }
-        return <Row>
-            <UserName id={this.state.id} name={this.state.username} />
-            <Rooms userid={this.state.id} />
-        </Row>
+
+        return <div>
+                <UserName id={this.state.id} name={this.state.username} />
+                <Rooms userid={this.state.id} />
+        </div>
     }
 
 
