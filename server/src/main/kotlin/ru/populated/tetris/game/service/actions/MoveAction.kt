@@ -31,8 +31,8 @@ class MoveAction : Action {
 
         putUserFigure(context, user, event)
 
-        user.baseX = user.baseX!!.plus(event.actionType.deltaX)
-        user.baseY = user.baseY!!.plus(event.actionType.deltaY)
+        user.deltaX = user.deltaX!!.plus(event.actionType.deltaX)
+        user.deltaY = user.deltaY!!.plus(event.actionType.deltaY)
     }
 
     protected fun deleteUserFigure(figure: Figure, context: Context) {

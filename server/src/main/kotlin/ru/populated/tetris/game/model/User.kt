@@ -9,7 +9,7 @@ class User : Serializable {
     var figure: Figure = Figure(0, 0, mutableListOf())
     var name: String? = null
     var color: Colors? = null
-    var baseX: Int? = null
-    var baseY: Int? = null
+    var deltaX: Int? = null
+    var deltaY: Int? = null
     var stateActionUser: StateSign = StateSign.NONE
 }

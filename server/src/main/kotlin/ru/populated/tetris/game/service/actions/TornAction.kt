@@ -55,8 +55,8 @@ class TornAction : MoveAction() {
                         .form?.get(index + 1)!!.stream()
                         .map { it.copy() }
                         .peek {
-                            it.x = user.baseX?.let { it1 -> it.x.plus(it1) }!!
-                            it.y = user.baseY?.let { it1 -> it.y.plus(it1) }!!
+                            it.x = user.deltaX?.let { it1 -> it.x.plus(it1) }!!
+                            it.y = user.deltaY?.let { it1 -> it.y.plus(it1) }!!
                         }.collect(Collectors.toList()))
     }
 }

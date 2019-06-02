@@ -22,7 +22,7 @@ enum class Figures(form: List<List<Part>>) {
                     Arrays.asList(Part(1, 0, false), Part(1, -1, true), Part(1, -2, false), Part(0, -1, false)),
                     Arrays.asList(Part(1, 0, false), Part(2, -1, false), Part(1, -1, true), Part(0, -1, false)),
                     Arrays.asList(Part(1, -2, false), Part(1, -1, true), Part(1, 0, false), Part(2, -1, false)),
-                    Arrays.asList(Part(0, -1, false), Part(1, -1, false), Part(2, -1, false), Part(1, -2, true))
+                    Arrays.asList(Part(0, -1, false), Part(1, -1, true), Part(2, -1, false), Part(1, -2, false))
             )
     );
 

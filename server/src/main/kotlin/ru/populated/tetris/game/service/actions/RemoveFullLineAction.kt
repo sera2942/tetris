@@ -32,8 +32,8 @@ class RemoveFullLineAction : Action {
                     context.gameField.board[it.y][it.x].userId = null
                 }
 
-        user.baseX = null
-        user.baseY = null
+        user.deltaX = null
+        user.deltaY = null
         user.figure.position = 0
         user.figure.form.clear()
     }

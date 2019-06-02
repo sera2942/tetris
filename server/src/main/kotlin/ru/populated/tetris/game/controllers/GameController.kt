@@ -134,14 +134,18 @@ class GameController {
     }
 
     protected fun nextMove(user: User, context: Context) {
-//        user.figure.figureNumber = Random.nextInt(0, Figures.values().size)
-        user.figure.figureNumber = 3
+
+        user.figure.figureNumber = Random.nextInt(0, Figures.values().size)
 
         takeNewFigureForUser(user)
+        user.deltaX = (context.gameField.length / context.users.size) * context.users.size - 2
+        user.deltaY = 0
+
         user.figure.form.stream()
                 .forEach {
-                    it.x = it.x.plus((context.gameField.length / context.users.size) * context.users.size - 2)
+                    it.x = it.x.plus(user.deltaX!!)
                 }
+
         user.color = Colors.values()[Random.nextInt(0, Colors.values().size)]
     }
 
@@ -149,14 +153,7 @@ class GameController {
         user.figure.form.addAll(Figures.values()[user.figure.figureNumber].form?.get(user.figure.position)!!
                 .stream()
                 .map { it.copy() }
-                .peek {
-                    if (it.base) {
-                        user.baseX = it.x
-                        user.baseY = it.y
-                    }
-                }
                 .collect(Collectors.toList())
         )
     }
-
 }
