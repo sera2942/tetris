@@ -2,7 +2,10 @@ package ru.populated.tetris.game.service.actions
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import ru.populated.tetris.game.model.*
+import ru.populated.tetris.game.model.Context
+import ru.populated.tetris.game.model.Figure
+import ru.populated.tetris.game.model.Figures
+import ru.populated.tetris.game.model.User
 import ru.populated.tetris.game.service.conditions.GameStatAggregator
 import ru.populated.tetris.game.web.model.ActionType
 import ru.populated.tetris.game.web.model.Event
@@ -38,9 +41,9 @@ class TornAction : MoveAction() {
     }
 
     private fun turn(user: User, context: Context, event: Event, figure: Figure) {
-        deleteUserFigure(figure, context)
+        erase(figure, context.gameField.board)
         user.figure.position = user.figure.position.plus(1)
-        putUserFigure(context, user, event)
+        render(context, user, event)
     }
 
     private fun getNewFigure(user: User): Figure {
@@ -49,14 +52,16 @@ class TornAction : MoveAction() {
 
         val index = user.figure.position
 
+        val form = Figures.values()[user.figure.figureNumber]
+                .form?.get(index + 1)!!.stream()
+                .map { it.copy() }
+                .peek {
+                    it.x = user.deltaX?.let { it1 -> it.x.plus(it1) }!!
+                    it.y = user.deltaY?.let { it1 -> it.y.plus(it1) }!!
+                }.collect(Collectors.toList())
+
         return Figure(user.figure.figureNumber,
                 user.figure.position,
-                Figures.values()[user.figure.figureNumber]
-                        .form?.get(index + 1)!!.stream()
-                        .map { it.copy() }
-                        .peek {
-                            it.x = user.deltaX?.let { it1 -> it.x.plus(it1) }!!
-                            it.y = user.deltaY?.let { it1 -> it.y.plus(it1) }!!
-                        }.collect(Collectors.toList()))
+                form)
     }
 }

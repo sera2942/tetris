@@ -7,18 +7,18 @@ import ru.populated.tetris.game.web.model.Event
 import ru.populated.tetris.game.web.model.StateSign
 
 @Component
-class RemoveFullLineAction : Action {
+class EndMoveAction : Action {
 
 
     override fun doAction(user: User, context: Context, event: Event) {
         if (user.stateActionUser == StateSign.ARCHIVE_END_OF_GAME_SPACE) {
-            takeFigureOfUser(user, context)
+            endMove(user, context)
             removeFullLine(context.gameField)
         }
     }
 
 
-    private fun takeFigureOfUser(user: User, context: Context) {
+    private fun endMove(user: User, context: Context) {
         user.figure
                 .form
                 .stream()
@@ -43,22 +43,26 @@ class RemoveFullLineAction : Action {
         val board: MutableList<MutableList<Cell>> = gameField.board
         for (y in 1..gameField.width) {
 
-            var doOverwriteLine = true
+            var isOverwriteLine = true
             for (x in 0..gameField.length) {
                 if (board[y][x].userId == null && board[y][x].color == null) {
-                    doOverwriteLine = false
+                    isOverwriteLine = false
                     break
                 }
             }
 
-            if (doOverwriteLine) {
-                for (innerY in y downTo 1) {
-                    for (x in 0..gameField.length) {
-                        if (board[innerY - 1][x].userId == null && board[innerY][x].userId == null) {
-                            board[innerY][x].color = board[innerY - 1][x].color
-                            board[innerY - 1][x] = Cell()
-                        }
-                    }
+            if (isOverwriteLine) {
+                eraseFullLine(y, gameField, board)
+            }
+        }
+    }
+
+    private fun eraseFullLine(y: Int, gameField: GameField, board: MutableList<MutableList<Cell>>) {
+        for (innerY in y downTo 1) {
+            for (x in 0..gameField.length) {
+                if (board[innerY - 1][x].userId == null && board[innerY][x].userId == null) {
+                    board[innerY][x].color = board[innerY - 1][x].color
+                    board[innerY - 1][x] = Cell()
                 }
             }
         }

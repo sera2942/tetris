@@ -1,7 +1,10 @@
 package ru.populated.tetris.game.service.actions
 
 import org.springframework.stereotype.Component
-import ru.populated.tetris.game.model.*
+import ru.populated.tetris.game.model.Cell
+import ru.populated.tetris.game.model.Context
+import ru.populated.tetris.game.model.Figure
+import ru.populated.tetris.game.model.User
 import ru.populated.tetris.game.web.model.ActionType
 import ru.populated.tetris.game.web.model.Event
 import ru.populated.tetris.game.web.model.StateSign
@@ -27,26 +30,26 @@ class MoveAction : Action {
 
     private fun move(user: User, context: Context, event: Event) {
 
-        deleteUserFigure(user.figure, context)
+        erase(user.figure, context.gameField.board)
 
-        putUserFigure(context, user, event)
+        render(context, user, event)
 
         user.deltaX = user.deltaX!!.plus(event.actionType.deltaX)
         user.deltaY = user.deltaY!!.plus(event.actionType.deltaY)
     }
 
-    protected fun deleteUserFigure(figure: Figure, context: Context) {
+    protected fun erase(figure: Figure, board: MutableList<MutableList<Cell>>) {
         figure.form.forEach {
             if (it.previousRenderState) {
-                context.gameField.board[it.y][it.x].userId = null
-                context.gameField.board[it.y][it.x].color = null
-                context.gameField.board[it.y][it.x].base = false
+                board[it.y][it.x].userId = null
+                board[it.y][it.x].color = null
+                board[it.y][it.x].base = false
             }
         }
 
     }
 
-    protected fun putUserFigure(context: Context, user: User, event: Event) {
+    protected fun render(context: Context, user: User, event: Event) {
         user.figure.form.forEach {
 
             if (user.stateActionUser == StateSign.TO_MOVE) {
@@ -57,7 +60,6 @@ class MoveAction : Action {
             if (it.render) {
                 context.gameField.board[it.y][it.x].userId = user.id
                 context.gameField.board[it.y][it.x].color = user.color!!.name
-                context.gameField.board[it.y][it.x].base = it.base
             }
         }
     }

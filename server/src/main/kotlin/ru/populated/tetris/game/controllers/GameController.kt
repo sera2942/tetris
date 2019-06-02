@@ -98,21 +98,24 @@ class GameController {
                 .subscribe {
                     if (!queue.isEmpty()) {
                         val context = play()
-                        if (context != null) {
-                            if (TypeState.IN_GAME == context.typeState) {
-                                source.onNext(BoardState(context.id, TypeState.IN_GAME, context.gameField.board))
-                            } else {
-                                source.onNext(BoardState(context.id, TypeState.GAME_OVER, context.gameField.board))
-                                contextService.store.remove(context.id)
-                            }
-                        }
-
-                        tickerSubject.onNext(10)
+                        publishNewGameState(context)
+                        tickerSubject.onNext(0)
                     } else {
                         tickerSubject.onNext(generationSpeed)
                     }
 
                 }
+    }
+
+    private fun publishNewGameState(context: Context?) {
+        if (context != null) {
+            if (TypeState.IN_GAME == context.typeState) {
+                source.onNext(BoardState(context.id, TypeState.IN_GAME, context.gameField.board))
+            } else {
+                source.onNext(BoardState(context.id, TypeState.GAME_OVER, context.gameField.board))
+                contextService.store.remove(context.id)
+            }
+        }
     }
 
     fun play(): Context? {
@@ -124,7 +127,9 @@ class GameController {
         if (user.figure.form.isEmpty()) {
             nextMove(user, context)
         }
+
         gameStatAggregator.aggregate(user, context, event)
+
         actions.stream()
                 .forEach { it.doAction(user, context, event) }
 
@@ -137,9 +142,8 @@ class GameController {
 
         user.figure.figureNumber = Random.nextInt(0, Figures.values().size)
 
-        takeNewFigureForUser(user)
-        user.deltaX = (context.gameField.length / context.users.size) * context.users.size - 2
-        user.deltaY = 0
+        getNewFigure(user)
+        resetUserData(user, context)
 
         user.figure.form.stream()
                 .forEach {
@@ -149,7 +153,12 @@ class GameController {
         user.color = Colors.values()[Random.nextInt(0, Colors.values().size)]
     }
 
-    private fun takeNewFigureForUser(user: User) {
+    private fun resetUserData(user: User, context: Context) {
+        user.deltaX = (context.gameField.length / context.users.size) * context.users.size - 2
+        user.deltaY = 0
+    }
+
+    private fun getNewFigure(user: User) {
         user.figure.form.addAll(Figures.values()[user.figure.figureNumber].form?.get(user.figure.position)!!
                 .stream()
                 .map { it.copy() }

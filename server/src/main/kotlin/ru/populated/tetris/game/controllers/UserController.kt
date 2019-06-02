@@ -22,7 +22,7 @@ class UserController {
     }
 
     @GetMapping
-    @CrossOrigin(origins = arrayOf("http://localhost:3000"))
+    @CrossOrigin(origins = ["http://localhost:3000"])
     fun registrateUser(@RequestParam(required = false) name: String): User {
         LOG.info("Registering user with name $name")
         return userService.registration(name)
