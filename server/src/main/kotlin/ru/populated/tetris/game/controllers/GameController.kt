@@ -17,16 +17,19 @@ import io.rsocket.kotlin.util.AbstractRSocket
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
-import ru.populated.tetris.game.model.BoardState
-import ru.populated.tetris.game.model.Context
-import ru.populated.tetris.game.model.Event
-import ru.populated.tetris.game.model.TypeState
+import ru.populated.tetris.game.model.*
 import ru.populated.tetris.game.service.ContextService
 import ru.populated.tetris.game.service.UserService
 import ru.populated.tetris.game.service.actions.Action
+import ru.populated.tetris.game.service.conditions.Aggregator
+import ru.populated.tetris.game.web.model.BoardState
+import ru.populated.tetris.game.web.model.Event
+import ru.populated.tetris.game.web.model.StateSign
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.TimeUnit
+import java.util.stream.Collectors
+import kotlin.random.Random
 
 @Controller
 class GameController {
@@ -50,9 +53,11 @@ class GameController {
     @Autowired
     lateinit var actions: List<Action>
 
+    @Autowired
+    lateinit var gameStatAggregator: Aggregator
+
     init {
         createIntervalWithVariableTimer()
-        LOG.info("GameController")
         closeable
                 .subscribe({
                     LOG.info("subscribed = $it")
@@ -115,9 +120,43 @@ class GameController {
         val event = queue.poll()
         val context = contextService.getContextById(event.contextId) ?: return null
         val user = userService.findUserById(event.userId) ?: return null
+
+        if (user.figure.form.isEmpty()) {
+            nextMove(user, context)
+        }
+        gameStatAggregator.aggregate(user, context, event)
         actions.stream()
                 .forEach { it.doAction(user, context, event) }
 
+        user.stateActionUser = StateSign.NONE
+
         return context
     }
+
+    protected fun nextMove(user: User, context: Context) {
+//        user.figure.figureNumber = Random.nextInt(0, Figures.values().size)
+        user.figure.figureNumber = 3
+
+        takeNewFigureForUser(user)
+        user.figure.form.stream()
+                .forEach {
+                    it.x = it.x.plus((context.gameField.length / context.users.size) * context.users.size - 2)
+                }
+        user.color = Colors.values()[Random.nextInt(0, Colors.values().size)]
+    }
+
+    private fun takeNewFigureForUser(user: User) {
+        user.figure.form.addAll(Figures.values()[user.figure.figureNumber].form?.get(user.figure.position)!!
+                .stream()
+                .map { it.copy() }
+                .peek {
+                    if (it.base) {
+                        user.baseX = it.x
+                        user.baseY = it.y
+                    }
+                }
+                .collect(Collectors.toList())
+        )
+    }
+
 }

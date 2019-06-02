@@ -1,43 +1,17 @@
 package ru.populated.tetris.game.service.actions
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import ru.populated.tetris.game.model.*
-import ru.populated.tetris.game.service.conditions.Condition
-import ru.populated.tetris.game.service.conditions.UserSpaceCondition
+import ru.populated.tetris.game.model.Cell
+import ru.populated.tetris.game.web.model.Event
+import ru.populated.tetris.game.web.model.StateSign
 
 @Component
 class RemoveFullLineAction : Action {
-    @Autowired
-    lateinit var endFreeGameSpace: Condition
 
-
-    @Autowired
-    lateinit var notFreeSpace: Condition
-
-
-    @Autowired
-    lateinit var gameSpace: Condition
-
-    @Autowired
-    lateinit var userSpace: UserSpaceCondition
 
     override fun doAction(user: User, context: Context, event: Event) {
-
-        if (Direction.SOUTH != event.direction
-                && Direction.EAST != event.direction
-                && Direction.WEST != event.direction
-                && Direction.NORTH != event.direction) {
-            return
-        }
-
-
-        val isItEndFreeGameSpace = !notFreeSpace.check(user, context, event) && endFreeGameSpace.check(user, context, event)
-        val isItFreeGameSpace = isItEndFreeGameSpace || !gameSpace.check(user, context, event)
-
-
-        if (Direction.SOUTH == event.direction && isItFreeGameSpace && !userSpace.check(user, context, event)) {
-
+        if (user.stateActionUser == StateSign.ARCHIVE_END_OF_GAME_SPACE) {
             takeFigureOfUser(user, context)
             removeFullLine(context.gameField)
         }
@@ -52,11 +26,11 @@ class RemoveFullLineAction : Action {
                 .findAny()
                 .ifPresent { context.typeState = TypeState.GAME_OVER }
 
-        user.figure.form.forEach {
-            if (it.y >= 0 && it.x >= 0) {
-                context.gameField.board[it.y][it.x].userId = null
-            }
-        }
+        user.figure.form
+                .filter { it.render }
+                .forEach {
+                    context.gameField.board[it.y][it.x].userId = null
+                }
 
         user.baseX = null
         user.baseY = null
@@ -66,12 +40,12 @@ class RemoveFullLineAction : Action {
 
     private fun removeFullLine(gameField: GameField) {
 
-        val bord: MutableList<MutableList<Cell>> = gameField.board
+        val board: MutableList<MutableList<Cell>> = gameField.board
         for (y in 1..gameField.width) {
 
             var doOverwriteLine = true
             for (x in 0..gameField.length) {
-                if (bord[y][x].userId == null && bord[y][x].color == null) {
+                if (board[y][x].userId == null && board[y][x].color == null) {
                     doOverwriteLine = false
                     break
                 }
@@ -80,9 +54,9 @@ class RemoveFullLineAction : Action {
             if (doOverwriteLine) {
                 for (innerY in y downTo 1) {
                     for (x in 0..gameField.length) {
-                        if (bord[innerY - 1][x].userId == null && bord[innerY][x].userId == null) {
-                            bord[innerY][x].color = bord[innerY - 1][x].color
-                            bord[innerY - 1][x] = Cell()
+                        if (board[innerY - 1][x].userId == null && board[innerY][x].userId == null) {
+                            board[innerY][x].color = board[innerY - 1][x].color
+                            board[innerY - 1][x] = Cell()
                         }
                     }
                 }

@@ -3,33 +3,31 @@ package ru.populated.tetris.game.service.actions
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import ru.populated.tetris.game.model.*
-import ru.populated.tetris.game.service.conditions.UserSpaceCondition
+import ru.populated.tetris.game.service.conditions.GameStatAggregator
+import ru.populated.tetris.game.web.model.ActionType
+import ru.populated.tetris.game.web.model.Event
+import ru.populated.tetris.game.web.model.StateSign
 import java.util.stream.Collectors
 
 @Component
 class TornAction : MoveAction() {
 
     @Autowired
-    lateinit var userSpace: UserSpaceCondition
+    lateinit var gameStatAggregator: GameStatAggregator
 
     override fun doAction(user: User, context: Context, event: Event) {
-        if (event.direction == Direction.TURN) {
+        if (event.actionType == ActionType.TURN) {
 
-            var oldFigure = user.figure
+            val oldFigure = user.figure
             user.figure = getNewFigure(user)
+            gameStatAggregator.aggregate(user, context, event)
 
-            if (gameSpace.check(user, context, event)) {
-                val isFreeSpace = notFreeSpace.check(user, context, event)
-                val isEndFreeGameSpace = endFreeGameSpace.check(user, context, event)
-
-                if (!isFreeSpace && !isEndFreeGameSpace && !userSpace.check(user, context, event)) {
-                    turn(user, context, event, oldFigure)
-                    resetFigurePosition(user)
-                }
-                return
+            if (user.stateActionUser == StateSign.TO_MOVE) {
+                turn(user, context, event, oldFigure)
+                resetFigurePosition(user)
+            } else {
+                user.figure = oldFigure
             }
-            user.figure = oldFigure
-
         }
     }
 
@@ -49,7 +47,7 @@ class TornAction : MoveAction() {
 
         resetFigurePosition(user)
 
-        var index = user.figure.position
+        val index = user.figure.position
 
         return Figure(user.figure.figureNumber,
                 user.figure.position,

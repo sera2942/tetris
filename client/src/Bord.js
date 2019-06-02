@@ -65,7 +65,7 @@ class Bord extends Component {
             client.connect().subscribe({
                 onComplete: socket => {
                     socket.fireAndForget({
-                        data: { contextId: this.props.roomid, userId: this.props.userid, direction: action },
+                        data: { contextId: this.props.roomid, userId: this.props.userid, actionType: action },
                         metadata: { another: { json: { value: true } } },
                     });
                 },
@@ -128,6 +128,8 @@ class Bord extends Component {
                     onError: error => console.error(error),
                     onNext: payload => {
                         var state = JSON.parse(payload.data)
+                        console.log(state)
+
                         if (state.contextId === this.props.roomid) {
                             this.setState({ list: state.board })
                             if ("GAME_OVER" === state.typeState) {
@@ -155,19 +157,16 @@ function getColor(cell, userId) {
     // console.log(number)
     var result = "column col d-inline ml-0 border"
     if (cell.color === "RED") {
-
         if (cell.userId == userId) {
             result = result + " cellOwnRed rounded"
         } else {
             result = result + " cellRed"
-
         }
     } else if (cell.color === "BLUE") {
         if (cell.userId == userId) {
             result = result + " cellOwnBlue rounded"
         } else {
             result = result + " cellBlue"
-
         }
     } else if (cell.color === "YELLOW") {
         if (cell.userId == userId) {
@@ -177,6 +176,14 @@ function getColor(cell, userId) {
         }
     } else {
         result = result + " border border-secondary"
+    }
+
+    switch(cell.color) {
+        case "RED" :
+
+    }
+    if (cell.base) {
+        result = result + " border-success"
     }
 
     return result
