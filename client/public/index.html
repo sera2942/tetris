@@ -31,41 +31,21 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-  <style>
-    html {
-      height: 100%;
-    }
-
-    body {
-      min-height: 100%;
-    }
-  </style>
-  <script>
-$.toast({
-  title: 'Toast',
-  subtitle: '11 mins ago',
-  content: 'Hello, world! This is a toast message.',
-  type: 'info',
-  delay: 5000
-}); </script>
+    <style>
+    #footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 2.5rem;            /* Footer height */
+  }
+    </style>
   <title>Tetris</title>
 </head>
 
 <body>
   <noscript>You need to enable JavaScript to run this app.</noscript>
-  <div id="root" class="container-fluid border border-primary">
-    <div class="toast ml-auto" role="alert" data-delay="700" data-autohide="false">
-      <div class="toast-header">
-        <strong class="mr-auto text-primary">Toast</strong>
-        <small class="text-muted">3 mins ago</small>
-        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-          <span aria-hidden="true">×</span>
-        </button>
-      </div>
-      <div class="toast-body">
-        Hey, there! This is a Bootstrap 4 toast.
-      </div>
-    </div>
+  <div id="root">
+
   </div>
   <!--
       This HTML file is a template.

@@ -44,12 +44,12 @@ class Rooms extends Component {
         var roomNumber = 0
         var children = 0
         if (this.state.id !== '') {
-            return <Card userid={this.props.userid} className="text-center mt-5">
-                <div className="card-header">
-                    Room №{this.state.number}
+            return <div userid={this.props.userid} className="d-flex flex-column">
+                <div class="bg-light">
+                    <h1 class="display-3 d-flex justify-content-center">Room №{this.state.number}</h1>
                 </div>
                 <Bord userid={this.props.userid} roomid={this.state.id} />
-            </Card>
+            </div>
         }
         return <Col userid={this.props.userid} className="mt-5">
             <Button className='btn btn-success mt-3 ml-2' onClick={this.handleClick}>Add room</Button>

@@ -5,7 +5,7 @@ import axios from 'axios'
 import UserName from './UserName.js'
 import Rooms from './Rooms'
 import './Common.scss';
-import { Col, Row, Button, Navbar } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import './Menu.scss'
 
 
@@ -42,23 +42,26 @@ class Menu extends Component {
     render() {
         if (this.state.id === '') {
             return (
-                <Row className="justify-content-center">
-                    <Col className="col-3 align-self-center">
-                        <form className="mt-5 jumbotron" onSubmit={this.handleClick}>
+                <div>
+                    <UserName id={this.state.id} name={this.state.username} />
+
+                    <div className="d-flex justify-content-center text-center mt-5">
+                        <form className="form-signin" onSubmit={this.handleClick}>
                             <div className="form-group">
                                 <label>User Name:</label>
                                 <input className="form-control" type="text" value={this.state.username} onChange={this.handleChange} />
                             </div>
                             <Button variant="primary justify-content-center" type="submit">Strat game</Button>
                         </form>
-                    </Col>
-                </Row>
+                    </div>
+
+                </div>
             )
         }
 
         return <div>
-                <UserName id={this.state.id} name={this.state.username} />
-                <Rooms userid={this.state.id} />
+            <UserName id={this.state.id} name={this.state.username} />
+            <Rooms userid={this.state.id} />
         </div>
     }
 

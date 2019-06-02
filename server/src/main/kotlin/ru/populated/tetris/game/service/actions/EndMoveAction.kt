@@ -2,7 +2,6 @@ package ru.populated.tetris.game.service.actions
 
 import org.springframework.stereotype.Component
 import ru.populated.tetris.game.model.*
-import ru.populated.tetris.game.model.Cell
 import ru.populated.tetris.game.web.model.Event
 import ru.populated.tetris.game.web.model.StateSign
 
@@ -27,6 +26,8 @@ class EndMoveAction : Action {
                 .ifPresent { context.typeState = TypeState.GAME_OVER }
 
         user.figure.form
+                .stream()
+                .filter { context.typeState != TypeState.GAME_OVER }
                 .filter { it.render }
                 .forEach {
                     context.gameField.board[it.y][it.x].userId = null

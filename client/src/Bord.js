@@ -82,15 +82,15 @@ class Bord extends Component {
                 open={this.state.gameIsOver}
                 closeOnDocumentClick>
                 {close => (
-                    <h1>Game OVER. You are loser &#128514;</h1>
+                    <h1>Game OVER.</h1>
                 )}
             </Popup>
         )
 
-        return <div className="overflow-auto p-1" onKeyDown={this.onKeyPressed}>
+        return <div className="overflow-auto p-1 border-bottom border-top shadow" onKeyDown={this.onKeyPressed}>
             {
                 this.state.list.map((row) =>
-                    <div className="row pl-3 pr-3" style={{ width: (40 * row.length) + "px" }} >
+                    <div className="d-flex bd-highlight">
                         {
                             row.map(
                                 (cell) => <div className={getColor(cell, this.props.userid)}></div>
@@ -154,39 +154,32 @@ class Bord extends Component {
 }
 
 function getColor(cell, userId) {
-    // console.log(number)
-    var result = "column col d-inline ml-0 border"
-    if (cell.color === "RED") {
-        if (cell.userId == userId) {
-            result = result + " cellOwnRed rounded"
-        } else {
-            result = result + " cellRed"
-        }
-    } else if (cell.color === "BLUE") {
-        if (cell.userId == userId) {
-            result = result + " cellOwnBlue rounded"
-        } else {
-            result = result + " cellBlue"
-        }
-    } else if (cell.color === "YELLOW") {
-        if (cell.userId == userId) {
-            result = result + " cellOwnYellow rounded"
-        } else {
-            result = result + " cellYellow"
-        }
-    } else {
-        result = result + " border border-secondary"
-    }
+    var result = "p-4 bd-highlight border border border-secondary"
 
-    switch(cell.color) {
-        case "RED" :
-
-    }
-    if (cell.base) {
-        result = result + " border-success"
+    switch (cell.color) {
+        case "RED":
+            setColorClass("cellRed", "cellOwnRed");
+            break
+        case "BLUE":
+            setColorClass("cellBlue", "cellOwnBlue");
+            break
+        case "YELLOW":
+            setColorClass("cellYellow", "cellOwnYellow");
+            break
+        default:
+            result = result + " border border-secondary"
     }
 
     return result
+
+    function setColorClass(colorClass, colorOwnClass) {
+        if (cell.userId == userId) {
+            result = result + " " + colorOwnClass + " rounded";
+        }
+        else {
+            result = result + " " + colorClass;
+        }
+    }
 };
 
 export default Bord
