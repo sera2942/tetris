@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="64px"
+   height="64px"
+   viewBox="0 0 64 64"
+   version="1.1"
+   id="SVGRoot"
+   inkscape:version="0.92.4 (33fec40, 2019-01-16)"
+   sodipodi:docname="tetris_logo.svg">
+  <defs
+     id="defs3833" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="11.313708"
+     inkscape:cx="27.4574"
+     inkscape:cy="33.480109"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1853"
+     inkscape:window-height="1025"
+     inkscape:window-x="2627"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:grid-bbox="true"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:object-nodes="true"
+     inkscape:snap-others="false"
+     inkscape:snap-global="true"
+     inkscape:snap-intersection-paths="false" />
+  <metadata
+     id="metadata3836">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       id="rect3882-3-6"
+       width="19.838215"
+       height="28.261637"
+       x="3.9942806"
+       y="15.933858"
+       transform="matrix(0.86756797,0.49731862,-0.00170366,0.99999855,0,0)"
+       style="fill:#000080;stroke-width:1.50373745"
+       ry="5.0955081" />
+    <rect
+       id="rect3882-3"
+       width="22.22781"
+       height="27.388805"
+       x="46.148186"
+       y="40.647343"
+       transform="matrix(0.86534527,-0.50117617,-0.00123552,0.99999924,0,0)"
+       style="fill:#ffdd55;stroke-width:1.56695652"
+       ry="4.9381394" />
+    <rect
+       id="rect3882"
+       width="22.22781"
+       height="27.388805"
+       x="23.920376"
+       y="40.647343"
+       transform="matrix(0.86534527,-0.50117617,-0.00123552,0.99999924,0,0)"
+       style="fill:#ff0000;stroke-width:1.56695652"
+       ry="4.9381394" />
+  </g>
+</svg>
