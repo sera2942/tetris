@@ -39,14 +39,16 @@ class MoveAction : Action {
     }
 
     protected fun erase(figure: Figure, board: MutableList<MutableList<Cell>>) {
-        figure.form.forEach {
-            if (it.previousRenderState) {
-                board[it.y][it.x].userId = null
-                board[it.y][it.x].color = null
-                board[it.y][it.x].base = false
-            }
-        }
-
+        figure.form
+                .stream()
+                .filter { it.previousRenderState }
+                .forEach {
+                    if (it.previousRenderState) {
+                        board[it.y][it.x].userId = null
+                        board[it.y][it.x].color = null
+                        board[it.y][it.x].base = false
+                    }
+                }
     }
 
     protected fun render(context: Context, user: User, event: Event) {
