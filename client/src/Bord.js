@@ -87,19 +87,20 @@ class Bord extends Component {
             </Popup>
         )
 
-        return <div className="overflow-auto p-1 border-bottom border-top shadow" onKeyDown={this.onKeyPressed}>
-            {
-                this.state.list.map((row) =>
-                    <div className="d-flex bd-highlight">
-                        {
-                            row.map(
-                                (cell) => <div className={getColor(cell, this.props.userid)}></div>
-                            )
-                        }
-                    </div>)
-            }
-            <PopupExample />
-
+        return <div className="d-flex justify-content-center border-bottom border-top shadow">
+            <div className="overflow-auto p-1" onKeyDown={this.onKeyPressed}>
+                {
+                    this.state.list.map((row) =>
+                        <div className="d-flex bd-highlight">
+                            {
+                                row.map(
+                                    (cell) => <div className={getColor(cell, this.props.userid)}></div>
+                                )
+                            }
+                        </div>)
+                }
+                <PopupExample />
+            </div>
         </div>
     }
 
@@ -154,7 +155,14 @@ class Bord extends Component {
 }
 
 function getColor(cell, userId) {
-    var result = "p-4 bd-highlight border border border-secondary"
+
+    var result = "p-4 bd-highlight border border "
+
+    if (cell.userId === userId) {
+        result = result + " border-white"
+    } else {
+        result = result + " border-secondary"
+    }
 
     switch (cell.color) {
         case "RED":
