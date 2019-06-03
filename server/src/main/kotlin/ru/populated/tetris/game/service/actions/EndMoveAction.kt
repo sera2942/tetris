@@ -21,7 +21,7 @@ class EndMoveAction : Action {
         user.figure
                 .form
                 .stream()
-                .filter { it.y == 0 }
+                .filter { it.y < 0 }
                 .findAny()
                 .ifPresent { context.typeState = TypeState.GAME_OVER }
 
