@@ -38,7 +38,7 @@ class GameController {
     private val port = 9988
     private val mapper = ObjectMapper().registerKotlinModule()
     private val closeable: Single<NettyContextCloseable> = initializeRSocket()
-    private var generationSpeed = 500L
+    private var generationSpeed = 50L
     private var tickerSubject = BehaviorSubject.createDefault<Long>(generationSpeed)
     private val source = PublishSubject.create<BoardState>()
 

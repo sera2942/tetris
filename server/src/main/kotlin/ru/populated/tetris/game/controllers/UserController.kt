@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*
 import ru.populated.tetris.game.model.User
 import ru.populated.tetris.game.service.UserService
 
+@CrossOrigin
 @RestController
 @RequestMapping("/user")
 class UserController {
@@ -22,7 +23,6 @@ class UserController {
     }
 
     @GetMapping
-    @CrossOrigin(origins = ["http://localhost:3000"])
     fun registrateUser(@RequestParam(required = false) name: String): User {
         LOG.info("Registering user with name $name")
         return userService.registration(name)
