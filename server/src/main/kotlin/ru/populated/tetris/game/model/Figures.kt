@@ -12,8 +12,8 @@ enum class Figures(form: List<List<Part>>) {
     ),
     ZIGZUG(
             Arrays.asList(
-                    Arrays.asList(Part(0, -2), Part(0, -1), Part(1, -1), Part(1, 0)),
-                    Arrays.asList(Part(0, -1), Part(-1, -2), Part(0, -2), Part(1, -1))
+                    Arrays.asList(Part(0, -1), Part(0, -2), Part(1, -2), Part(1, -3)),
+                    Arrays.asList(Part(0, -2), Part(1, -2), Part(1, -1), Part(2, -1))
             )
     ),
     SQUARE(Arrays.asList(Arrays.asList(Part(0, -1), Part(1, -1), Part(0, 0), Part(1, 0)))),
