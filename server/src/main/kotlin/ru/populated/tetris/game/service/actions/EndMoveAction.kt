@@ -2,6 +2,7 @@ package ru.populated.tetris.game.service.actions
 
 import org.springframework.stereotype.Component
 import ru.populated.tetris.game.model.*
+import ru.populated.tetris.game.web.model.ActionType
 import ru.populated.tetris.game.web.model.Event
 import ru.populated.tetris.game.web.model.StateSign
 
@@ -10,12 +11,11 @@ class EndMoveAction : Action {
 
 
     override fun doAction(user: User, context: Context, event: Event) {
-        if (user.stateActionUser == StateSign.ARCHIVE_END_OF_GAME_SPACE) {
+        if (user.stateActionUser == StateSign.ARCHIVE_END_OF_GAME_SPACE && event.actionType == ActionType.SOUTH) {
             endMove(user, context)
             removeFullLine(context.gameField)
         }
     }
-
 
     private fun endMove(user: User, context: Context) {
         user.figure
